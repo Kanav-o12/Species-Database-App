@@ -1,5 +1,6 @@
 CREATE TABLE species (
   id UUID PRIMARY KEY,
+  language TEXT NOT NULL,
   scientific_name TEXT,
   common_name TEXT,
   etymology TEXT,
