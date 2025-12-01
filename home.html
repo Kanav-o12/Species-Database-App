@@ -1,208 +1,323 @@
 <!DOCTYPE html>
-<html lang = "en">
+<html lang="en">
 <head>
-    <meta charset = "UTF-8">
-    <title>SBA Home</title>  <!--Title for home page-->
-    <meta name = "viewport" content = "width = device-width, initial-scale = 1.0">
+    <meta charset="UTF-8" />
+    <title>SBA Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- This code is for PWA -->
-    <link rel = "manifest" href = "manifest.json">
-    <meta name = "theme-color" content = "#fff3ff">
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#fff3ff" />
 
     <style>
-        /* Styles for home page */
+        /* Body background and font */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            background: #8DC63F;
+            background: #9ACD6B;
             color: #000000;
             display: flex;
             justify-content: center;
             align-items: flex-start;
             min-height: 100vh;
-            padding: 0;
-
+            padding: 1rem 0;
         }
 
-    /* The app shell here is the design of the size of the body that we will create our phone from.
-    It is currently a placeholder while we figure out responsive mobile app design. */
-    .app-shell {
-        background: #f9fbfc;
+        /* Container for the app */
+        .app-shell {
+            background: #ffffff;
+            width: 100%;
+            max-width: 480px;
+            min-height: 600px;
+            margin: 0 auto;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.15);
+            padding: 0; /* HEADER already has padding */
+            box-sizing: border-box;
+        }
 
-        width: 100%;
-        max-width: 480px;
-        min-height: 600px;
+        /* NEW HEADER — matches screenshot */
+        .app-header {
+            width: 100%;
+            background-color: #0B5C37;
+            padding: 1.5rem;
+            border-radius: 16px 16px 0 0;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            box-sizing: border-box;
+        }
 
-        margin: 0 auto;
-        margin-top: 1rem;
+        /* HEADER TOP (title + EN button) */
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
 
-        border-radius: 0;
-        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.45);
+        .header-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin: 0;
+        }
 
-        padding: 2rem 1.5rem 2.5rem;
-        box-sizing: border-box;
-    }
+        .lang-btn {
+            background: white;
+            color: #0B5C37;
+            border: none;
+            padding: 0.5rem 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.25s;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
 
-    .app-title {
-        text-align: center;
-        margin: 0 0 2.5rem 0;
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: #0f172a;
-    }
+        /* SEARCH BAR (missing earlier — now added!) */
+        .search-bar {
+            background: #FFFFFF;
+            border-radius: 999px;
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
 
-    .app-subtitle{
-        text-align: center;
-        margin: -1.5rem 0 2.5rem 0;
-        font-size: 1rem;
-        color: #475569;
-    }
+        .search-icon {
+            font-size: 1.2rem;
+            color: #475569;
+        }
 
-    /* Logo styling (small, centered) */
-    .app-logo {
-        width: 140px;
-        display: block;
-        margin: 0 auto 1.25rem auto;
-    }
+        .search-bar input {
+            border: none;
+            outline: none;
+            width: 100%;
+            font-size: 1rem;
+        }
 
-    .lang-toggle{
-        display: flex;
-        border-radius: 999px;
-        overflow: hidden;
-        border: 1px solid #0f172a;
-        background: #f9fbfc;
-    }
+        /* --- Your existing CSS remains unchanged below --- */
 
-    /* Filter Carousel Styles */
-    .filter-carousel-container {
-        margin-bottom: 1.5rem;
-        position: relative;
-    }
+        .app-title {
+            text-align: center;
+            margin: 0 0 2.5rem 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #0f172a;
+        }
 
-    .filter-carousel {
-        display: flex;
-        overflow-x: auto;
-        overflow-y: hidden;
-        scroll-behavior: smooth;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none; /* Firefox */
-        -ms-overflow-style: none; /* IE and Edge */
-        gap: 0.75rem;
-        padding: 0.5rem 0;
-        margin: 0 -1.5rem;
-        padding-left: 1.5rem;
-        padding-right: 1.5rem;
-    }
+        .app-subtitle{
+            text-align: center;
+            margin: -1.5rem 0 2.5rem 0;
+            font-size: 1rem;
+            color: #475569;
+        }
 
-    .filter-carousel::-webkit-scrollbar {
-        display: none; /* Chrome, Safari, Opera */
-    }
+        .app-logo {
+            width: 140px;
+            display: block;
+            margin: 0 auto 1.25rem auto;
+        }
 
-    .filter-button {
-        flex: 0 0 auto;
-        padding: 0.625rem 1.25rem;
-        border-radius: 999px; /* Oval shape */
-        border: 1.5px solid #cbd5e1;
-        background: #ffffff;
-        color: #475569;
-        font-size: 0.875rem;
-        font-weight: 500;
-        cursor: pointer;
-        white-space: nowrap;
-        transition: all 0.2s ease;
-        user-select: none;
-        -webkit-tap-highlight-color: transparent;
-    }
+        .lang-toggle{
+            display: flex;
+            border-radius: 999px;
+            overflow: hidden;
+            border: 1px solid #0f172a;
+            background: #f9fbfc;
+        }
 
-    .filter-button:hover {
-        background: #f1f5f9;
-        border-color: #94a3b8;
-    }
+        .filter-carousel-container {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
 
-    .filter-button.active {
-        background: #0f172a;
-        color: #ffffff;
-        border-color: #0f172a;
-        box-shadow: 0 2px 4px rgba(15, 23, 42, 0.2);
-        transform: scale(1.05);
-    }
+        .filter-carousel {
+            display: flex;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            gap: 0.75rem;
+            padding: 0.5rem 0;
+            margin: 0 -1.5rem;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
 
-    .filter-button:active {
-        transform: scale(0.98);
-    }
+        .filter-carousel::-webkit-scrollbar {
+            display: none;
+        }
 
-    .filter-button.active:active {
-        transform: scale(1.02);
-    }
+        .filter-button {
+            flex: 0 0 auto;
+            padding: 0.625rem 1.25rem;
+            border-radius: 999px;
+            border: 1.5px solid #cbd5e1;
+            background: #ffffff;
+            color: #475569;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .filter-button:hover {
+            background: #f1f5f9;
+            border-color: #94a3b8;
+        }
+
+        .filter-button.active {
+            background: #0f172a;
+            color: #ffffff;
+            border-color: #0f172a;
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.2);
+            transform: scale(1.05);
+        }
+
+        .container#species-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            padding: 1.5rem;
+        }
+
+        .species-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: #F5F7FA;
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.1);
+        }
+
+        .species-item img {
+            width: 64px;
+            height: 64px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .species-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .species-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin: 0 0 0.25rem 0;
+        }
+
+        .species-subname {
+            font-size: 0.9rem;
+            color: #6B7280;
+            margin: 0;
+        }
+
+        .app-logo {
+            width: 140px;
+            display: block;
+            margin: 3rem auto 1.5rem auto;
+        }
+
+        .app-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-align: center;
+            margin: 0 0 1rem 0;
+        }
+
+        .lang-label {
+            font-size: 1rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            font-size: 1rem;
+            line-height: 1.5;
+            text-align: center;
+            margin: 0 1rem 2rem 1rem;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            color: #0B5C37;
+            font-weight: 600;
+            text-decoration: none;
+            margin-bottom: 2rem;
+        }
+
+        .debug {
+            font-size: 0.8rem;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
-    <main class = "app-shell">
-      
-        <!-- Filter Carousel - Added above species list -->
-        <div class="filter-carousel-container">
-            <div class="filter-carousel" id="filter-carousel">
-                <button class="filter-button" data-filter="all">All</button>
-                <button class="filter-button" data-filter="a-z">A-Z</button>
-                <button class="filter-button" data-filter="scientific-name">Scientific Name</button>
-                <button class="filter-button" data-filter="leaf-type">Leaf Type</button>
-                <button class="filter-button" data-filter="fruit-type">Fruit Type</button>
-                <button class="filter-button" data-filter="common-name">Common Name</button>
-            </div>
+
+<main class="app-shell">
+
+    <header class="app-header">
+        <div class="header-top">
+            <h1 class="header-title">Species Database</h1>
+            <button class="lang-btn">EN</button>
         </div>
-
-        <div class="container" id="species-list"></div>
-
-        <script src="scripts/specieslist.js"></script>
-        <script src="scripts/filterCarousel.js"></script>
-
-        <!-- Logo above the main title -->
-        <img src="Assets/Images/Camouflage18/logo-placeholder.png" alt="Species Database App Logo" class="app-logo">
-
-        <h1>Species Database App</h1>
-        <p class = "lang-label" id = "langLabel">
-            Placeholder result of loading language
-        </p>
-
-        <p>
-            This is the home page that will contain our main content.
-            for now it is just a placeholder.
-        </p>
-
-        <a class = "back-link" href = "index.html"> 
-            Change Language
-        </a>
-
-        <div class = "debug" id = "debugInfo">
-            <!-- Debug information will be displayed here -->
+        
+        <div class="search-bar">
+            <span class="search-icon">🔍</span>
+            <input type="text" placeholder="Search species">
         </div>
-    </main>
+    </header>
 
-    <!-- The Script controls language and local storage of languages -->
-    <script>
-        let lang = "en"; //Default language
+    <div class="container" id="species-list"></div>
 
-        try {
-            const stored = localStorage.getItem("appLanguage");
-            if (stored === "en" || stored === "tet") {
-                lang = stored;
-            }
-        } catch (e) {
-            console.warn("Could not access localStorage:", e);
+    <script src="scripts/specieslist.js"></script>
+    <script src="scripts/filterCarousel.js"></script>
+
+    <img src="Assets/Images/Camouflage18/logo-placeholder.png" alt="Species Database App Logo" class="app-logo" />
+
+    <h1 class="app-title">Species Database App</h1>
+    <p class="lang-label" id="langLabel">Placeholder result of loading language</p>
+
+    <p>This is the home page that will contain our main content. For now it is just a placeholder.</p>
+
+    <a class="back-link" href="index.html">Change Language</a>
+
+    <div class="debug" id="debugInfo"></div>
+
+</main>
+
+<script>
+    let lang = "en";
+
+    try {
+        const stored = localStorage.getItem("appLanguage");
+        if (stored === "en" || stored === "tet") {
+            lang = stored;
         }
+    } catch (e) {
+        console.warn("Could not access localStorage:", e);
+    }
 
-        const langLabel = document.getElementById("langLabel");
-        const debugInfo = document.getElementById("debugInfo");
+    const langLabel = document.getElementById("langLabel");
+    const debugInfo = document.getElementById("debugInfo");
 
-        if (lang === "en") {
-            langLabel.textContent = "Current Language: English";
-        } else if (lang === "tet") {
-            langLabel.textContent = "Current Language: Tetum";
-        } else {
-            langLabel.textContent = "Current Language: Unknown";
-        }
+    langLabel.textContent =
+        lang === "en" ? "Current Language: English" :
+        lang === "tet" ? "Current Language: Tetum" :
+        "Current Language: Unknown";
 
-        debugInfo.textContent = `Debug Info: App Language = "${lang}"`;
-    </script>
+    debugInfo.textContent = `Debug Info: App Language = "${lang}"`;
+</script>
+
 </body>
 </html>
