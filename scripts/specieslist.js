@@ -1,6 +1,7 @@
 //JSON dummy data
 const dummyData = [
     {
+        "id": "001",
         "scientific_name": "Albizia-lebbeck",
         "common_name": "Ai-Samatuku",
         "etymology": "Albizia honors Filippo degli Albizzi, who introduced an Albizia to Europe, and lebbeck comes from the local Arabic/Indic name “lebbek/labakh",
@@ -13,6 +14,7 @@ const dummyData = [
         "image_url": "./Assets/Images/albizia-lebbeck/01.png"
     },
     {
+        "id": "002",
         "scientific_name": "Azadirachta-indica",
         "common_name": "Sumaer Malae",
         "etymology": "Albizia honors Filippo degli Albizzi, who introduced an Albizia to Europe, and lebbeck comes from the local Arabic/Indic name “lebbek/labakh",
@@ -33,14 +35,20 @@ function renderSpecies(data){
 
     //loop for creating each element of species inside the list container
     data.forEach(species => {
-        speciesList.innerHTML += `<div style="display:flex;margin-bottom:15px;border: 1px solid #ccc; border-radius: 8px; padding: 10px;">
+        speciesList.innerHTML += `<div id="${species.id}" style="display:flex;margin-bottom:15px;border: 1px solid #ccc; border-radius: 8px; padding: 10px;" onclick="goToDetail(${species.id})">
         <img src="${species.image_url}" width="100" style="border-radius:8px;">
         <div>
-        <h3 style="font-weight:500;margin-left:20;">${species.scientific_name}</h3>
-        <p style="color:grey;margin-left:20;">${species.common_name}</p>
+        <h3 style="font-weight:500;margin-left:25px;">${species.scientific_name}</h3>
+        <p style="color:grey;margin-left:25px;">${species.common_name}</p>
         </div>
         </div>`;
     });
 }
 
 renderSpecies(dummyData);
+
+function goToDetail(id){
+    //open the specific species detail page for the selected one
+    //window.location.href = `specie.html?id=${id}`;
+    window.location.href = "specie.html";
+}
