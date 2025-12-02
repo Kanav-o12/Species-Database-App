@@ -35,7 +35,8 @@ function renderSpecies(data){
 
     //loop for creating each element of species inside the list container
     data.forEach(species => {
-        speciesList.innerHTML += `<div id="${species.id}" style="display:flex;margin-bottom:15px;border: 1px solid #ccc; border-radius: 8px; padding: 10px;" onclick="goToDetail(${species.id})">
+        speciesList.innerHTML += `<div id="${species.id}" style="display:flex;margin-bottom:15px;border: 1px solid #ccc; border-radius: 8px; padding: 10px;" 
+        onclick="goToDetail('${species.id}')">
         <img src="${species.image_url}" width="100" style="border-radius:8px;">
         <div>
         <h3 style="font-weight:500;margin-left:25px;">${species.scientific_name}</h3>
@@ -45,10 +46,13 @@ function renderSpecies(data){
     });
 }
 
-renderSpecies(dummyData);
+if (document.getElementById("species-list")) {
+    renderSpecies(dummyData);
+}
+
 
 function goToDetail(id){
     //open the specific species detail page for the selected one
-    //window.location.href = `specie.html?id=${id}`;
-    window.location.href = "specie.html";
+    window.location.href = `specie.html?id=${id}`;
+    //window.location.href = "specie.html";
 }
