@@ -73,6 +73,13 @@ async def process_file(file_path: str, translate: bool = True):
 
     normalized_cols = {normalize(c): c for c in df.columns}
 
+    missing_cols = [col for col in db_cols if normalize(col) not in normalized_cols]
+    if missing_cols:
+        raise Exception(
+            f"❌ Missing required columns in uploaded file: {missing_cols}. "
+            f"Please check the column names and try again."
+        )
+
     for idx in range(len(df)):
         row_raw = {}
 
