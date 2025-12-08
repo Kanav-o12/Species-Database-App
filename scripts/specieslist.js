@@ -76,9 +76,11 @@ async function loadExcelData(url) {
         etymology: row["Etymology"] || "",
         habitat: row["Habitat"] || "",
         phenology: row["Phenology"] || "",
+        identification_characters: row["Identification Characters"] || "",
         leaf_type: row["Leaf type"] || "",
-        fruit_type: row["Fruit type"] || "",
-        seed_germination: row["Seed germination"] || "",
+        fruit_type: row["Fruit Type"] || "",
+        seed_germination: row["Seed Germination"] || "",
+        pest: row["Pest"] || "",
         image_url: `./Assets/Images/${row["Scientific name"].replace(/\s+/g, "-").toLowerCase()}/${row["Scientific name"].replace(/\s+/g, "_").toLowerCase()}_seed_01.png`
     }));
 
