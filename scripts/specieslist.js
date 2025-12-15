@@ -36,14 +36,14 @@ function renderSpecies(data){
     //loop for creating each element of species inside the list container
     data.forEach(species => {
         speciesList.innerHTML += `
-        <div id="${species.id}" style="display:flex; align-items:flex-start; margin-bottom:15px; border: 1px solid #ccc; border-radius: 8px; padding: 10px; height:80px;" 
+        <div id="${species.id}" class="species-list-card" style="display:flex; align-items:center; margin-bottom:8px; border: 2px solid #4E8A16; border-radius: 8px; padding: 10px; height:80px;" 
             onclick="goToDetail('${species.id}')">
             
             <img src="${species.image_url}" width="90" style="border-radius:8px; margin-right:15px;">
             
             <div style="display:flex; flex-direction:column; justify-content:center; align-items:flex-start;">
                 <h3 style="margin:0; font-weight:500;">${species.scientific_name}</h3>
-                <p style="margin:0; color:grey;">${species.common_name}</p>
+                <p class="common-name-species">${species.common_name}</p>
             </div>
         </div>`;
     });
