@@ -26,18 +26,18 @@ const dummyData = [
         "seed_germination": "Collect pods when they’re dry, light brown, and before they split; sun-dry a few days so they open, then clean and store seeds dry. Pre-treat by pouring just-boiled water over the seeds and soak 12–24 hours to soften the hard coat. Fill germination bed  with Soil : Sand : Compost in a 1:1:1 mix. Sow ~1 cm deep; in beds space seeds ~5 cm apart in rows, germination usually starts in about 1–2 weeks with fresh, pre-treated seed.",
         "image_url": "./Assets/Images/azadirachta-indica/01.png"
     }
-]
+];
 
 //Render the Species list 
 function renderSpecies(data){
     const speciesList = document.getElementById("species-list");
     speciesList.innerHTML = "";
 
-    //loop for creating each element of species inside the list container
     data.forEach(species => {
         speciesList.innerHTML += `
-        <div id="${species.id}" class="species-list-card" style="display:flex; align-items:center; margin-bottom:8px; border: 2px solid #4E8A16; border-radius: 8px; padding: 10px; height:80px;" 
-            onclick="goToDetail('${species.id}')">
+        <div id="${species.id}" class="species-list-card" 
+             style="display:flex; align-items:center; margin-bottom:8px; border: 2px solid #4E8A16; border-radius: 8px; padding: 10px; height:80px;" 
+             onclick="goToDetail('${species.id}')">
             
             <img src="${species.image_url}" width="90" style="border-radius:8px; margin-right:15px;">
             
@@ -47,6 +47,17 @@ function renderSpecies(data){
             </div>
         </div>`;
     });
+}
+
+// ✅ NEW — No results UI (minimal + UX-safe)
+function renderNoResults() {
+    const speciesList = document.getElementById("species-list");
+    speciesList.innerHTML = `
+        <div style="text-align:center; padding:2rem; color:#475569;">
+            <p style="font-size:1.1rem; font-weight:600;">No results found</p>
+            <p style="font-size:0.9rem;">Try checking your spelling or searching again.</p>
+        </div>
+    `;
 }
 
 //set global JSON data for species read from excel
@@ -60,16 +71,11 @@ async function loadExcelData(url) {
     const response = await fetch(url);
     const arrayBuffer = await response.arrayBuffer();
 
-    // Read workbook xlsx
     const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-
-    // Get the first sheet
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
 
-    // Convert data to JSON format
-    const jsonData = XLSX.utils.sheet_to_json(sheet, { defval: "" }).map(row => ({
-        //id: row["Scientific name"].replace(/\s+/g, "-").toLowerCase(),
+    return XLSX.utils.sheet_to_json(sheet, { defval: "" }).map(row => ({
         id: row["Scientific name"],
         scientific_name: row["Scientific name"] || "",
         common_name: row["Common name"] || "",
@@ -83,32 +89,28 @@ async function loadExcelData(url) {
         pest: row["Pest"] || "",
         image_url: `./Assets/Images/${row["Scientific name"].replace(/\s+/g, "-").toLowerCase()}/${row["Scientific name"].replace(/\s+/g, "_").toLowerCase()}_seed_01.png`
     }));
-
-    return jsonData;
 }
 
 function goToDetail(id){
-    //Set the local storage to store the selected species data
     const species = loadedSpeciesData.find(s => s.id === id);
     localStorage.setItem("selected_species", JSON.stringify(species));
-
-    //open the specific species detail page for the selected one
     window.location.href = `specie.html?id=${id}`;
-    //window.location.href = "specie.html";
 }
 
 if (document.getElementById("species-list")) {
-    //Load excel file
-    loadExcelData(excelFileUrl).then((data) => {
-        loadedSpeciesData = data;
-        renderSpecies(data);
-        console.log("Loaded Excel data:", data);
-    }).catch(err => {
-        console.error("Error loading Excel:", err);
-        //renderSpecies(dummyData);
-    });
+    loadExcelData(excelFileUrl)
+        .then((data) => {
+            loadedSpeciesData = data;
+            renderSpecies(data);
+        })
+        .catch(err => {
+            console.error("Error loading Excel:", err);
+        });
 }
 
+// ------------------------------
+// SEARCH FUNCTIONALITY (UPDATED)
+// ------------------------------
 const searchInput = document.getElementById("searchInput");
 
 if (searchInput) {
@@ -127,6 +129,11 @@ if (searchInput) {
             species.scientific_name.toLowerCase().includes(query)
         );
 
-        renderSpecies(filteredData);
+        // ✅ NEW CONDITION
+        if (filteredData.length === 0) {
+            renderNoResults();
+        } else {
+            renderSpecies(filteredData);
+        }
     });
 }
