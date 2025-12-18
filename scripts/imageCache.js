@@ -18,6 +18,13 @@ async function loadSpeciesImages(scientificName) {
 
                 gallery.appendChild(img);
             });
+            /*
+            if(navigator.serviceWorker.controller){
+                navigator.serviceWorker.controller.postMessage({
+                    type: "CACHE_IMAGES",
+                    images: imageUrls
+                })
+            }*/
         }
         console.log(gallery);
     } catch (e) {

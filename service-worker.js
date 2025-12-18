@@ -2,9 +2,14 @@
 
 const CACHE_NAME = "sba-cache";
 
+//Files that need to be cahced
 const FILES_TO_CACHE = [
-    "/data/images.json",
-    "/Assets/Images"
+    "/index.html",
+    "/home.html",
+    "/specie.html",
+    "/scripts/specieslist.js",
+    "/scripts/imageCache.js",
+    "/data/images.json"
 ];
 
 self.addEventListener('install', (event) => {
@@ -39,14 +44,18 @@ self.addEventListener('fetch', (event) => {
                     if (event.request.destination === "image") {
                     return caches.open(CACHE_NAME).then(cache => {
                         cache.put(event.request, response.clone());
-                        return response;
+                         return response;
                     });
                 }
                 return response;
             }).catch(() => {
-                   if (event.request.destination === "image") {
-                        return new Response(null, {status:204});
-                    }
+                //fallback when offline
+                if (event.request.destination === "image") {
+                    return caches.match(event.request) || new Response('', {status:404});
+                }
+                if (event.request.mode === "navigate") {
+                    return caches.match(event.request)
+                }
             });
         })
     );
