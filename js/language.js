@@ -1,11 +1,6 @@
     const languages = [
       { code: "en-AU", name: "ENGLISH AU", flag: "🇦🇺" },
       { code: "tet",   name: "Tetum",      flag: "🇹🇱" },
-      { code: "ar",    name: "Arabic",     flag: "🇦🇪" },
-      { code: "es",    name: "Spanish",    flag: "🇪🇸" },
-      { code: "fr",    name: "French",     flag: "🇫🇷" },
-      { code: "de",    name: "German",     flag: "🇩🇪" },
-      { code: "hi",    name: "Hindi",      flag: "🇮🇳" },
     ];
 
     let selected = languages[0];
