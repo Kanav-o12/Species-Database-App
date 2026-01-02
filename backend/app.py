@@ -30,41 +30,30 @@ def require_role(allowed_roles: list[str]):
     user_id = request.headers.get("auth-user-id", type=int)
 
     if not user_id:
-        return jsonify({"error": "missing user id"}), 401
-    
-
-    data = request.json
-    if not data:
-        return jsonify({"error": " missing request body"}), 400
-
-    name = data.get("name")
-    password = data.get("password")
-
-    if not name or not password:
-        return jsonify({"error": "name and password required"}), 400
+        return False, ("missing user id", 401)
     
     #getting user from supabase
     resp =(
         supabase.table("users")
-        .select("user_id", "password_hash", "role", "is_active")
-        .eq("name",name)
+        .select("role", "is_active")
+        .eq("user_id",user_id)
         .limit(1)
         .execute()
     )
 
     #if user non existent
     if not resp.data:
-        return jsonify({"error": "invalid credentials"}), 401
+        return False, ("user not found", 401)
     
     user = resp.data[0]
 
     #admins able to disable accounts
     # check applies when device is online
     if not user["is_active"]:
-        return jsonify({"error": "account disabled"}), 403
+        return False, ("account disabled", 403)
     
     if user["role"] not in allowed_roles:
-        return False, "no permissions"
+        return False, ("no permissions" , 403)
     
     return True, None
 
