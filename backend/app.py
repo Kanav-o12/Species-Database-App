@@ -6,9 +6,16 @@ import bcrypt
 from supabase import create_client
 import os
 from flask_cors import CORS
-
+import os
+from pathlib import Path
+from dotenv import load_dotenv
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
+
+
+    
+env_file = Path(__file__).parent / '.env.local'
+load_dotenv(dotenv_path=env_file)
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_SERVICE_KEY = os.environ.get("SUPABASE_KEY")

@@ -35,4 +35,4 @@ env/
 __pycache__/
 .env
 *.log
-C:\Users\aussc\Documents\Code\Chameleon\Clone2\Species-Database-App\backend\app2.py
+backend/.env.local

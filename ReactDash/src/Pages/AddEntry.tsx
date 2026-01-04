@@ -5,13 +5,25 @@ import Button from '@mui/material/Button'
 import React, { useState } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import Alert from '@mui/material/Alert'
+import axios from 'axios';
 
 
 const supabase = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY)
+const supabaseTetum = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY)
 
+const API_URL = import.meta.env.VITE_API_URL
 
 export default function Page1() {
+    //Max char length for english text boxes
+    const maxEnglishChar = 2000
+    //Max char length for Tetum text. (10% has been added just incase the translation comes back with more characters.)
+    const maxTetumChar = maxEnglishChar + (maxEnglishChar * 0.10)
+    //Max char length for names / fruit and leaf types
+    const maxSmallTextChar = 100
+
+
     const [error, setError] = useState('')
+
 
     const [formData, setFormData] = useState({
         scientificName: '',
@@ -26,15 +38,97 @@ export default function Page1() {
         pests: ''
     })
 
+    const [formDataTetum, setFormDataTetum] = useState({
+        scientificNameTetum: '',
+        commonNameTetum: '',
+        leafTypeTetum: '',
+        fruitTypeTetum: '',
+        etymologyTetum: '',
+        habitatTetum: '',
+        identificationCharacteristicsTetum: '',
+        phenologyTetum: '',
+        seedGerminationTetum: '',
+        pestsTetum: ''
+    })
+
     const [loading, setLoading] = useState(false)
     const [status, setStatus] = useState('')
 
+    const [tetumTranslate, setTetumTranslate] = useState(false)
 
 
+    const translateToTetum = async () => {
+        setLoading(true)
+        //Checks
+        if (formData.scientificName == "") {setError('Scientific Name Cannot be empty'); setLoading(false); setTetumTranslate(false); return}
+        if (formData.commonName == "") {setError('Common Name Cannot be empty'); setLoading(false); setTetumTranslate(false); return}
+        if (formData.leafType == "") {setError('Leaf Type Cannot be empty'); setLoading(false); setTetumTranslate(false); return}
+        if (formData.fruitType == "") {setError('Fruit Type Cannot be empty'); setLoading(false); setTetumTranslate(false); return}
+        
+        console.log("URL: ", API_URL)
+        const tempEtymology = formData.etymology == "" ? "-" : formData.etymology
+        const tempHabitat = formData.habitat == "" ? "-" : formData.habitat
+        const tempIdent = formData.identificationCharacteristics == "" ? "-" : formData.identificationCharacteristics
+        const tempPhenology = formData.phenology == "" ? "-" : formData.phenology
+        const tempSeed = formData.seedGermination == "" ? "-" : formData.seedGermination
+        const tempPest = formData.pests == "" ? "-" : formData.pests           
 
 
+        const textArray = [formData.scientificName, formData.commonName, formData.leafType, formData.fruitType, tempEtymology, tempHabitat, tempIdent, tempPhenology, tempSeed, tempPest]
+        console.log('Translation: ', textArray)
+        try {
+            const response = await axios.post(API_URL, { text: textArray})
+            console.log('Translation: ', response)
+
+            const translations = response.data
+
+            if (translations[4] == "-") {
+                translations[4] == ""
+            }
+            if (translations[5] == "-") {
+                translations[5] == ""
+            }
+            if (translations[6] == "-") {
+                translations[6] == ""
+            }
+            if (translations[7] == "-") {
+                translations[7] == ""
+            }
+            if (translations[8] == "-") {
+                translations[8] == ""
+            }
+            if (translations[9] == "-") {
+                translations[9] == ""
+            }
+
+            setFormDataTetum({
+                scientificNameTetum: translations[0],
+                commonNameTetum: translations[1],
+                leafTypeTetum: translations[2],
+                fruitTypeTetum: translations[3],
+                etymologyTetum: translations[4],
+                habitatTetum: translations[5],
+                identificationCharacteristicsTetum: translations[6],
+                phenologyTetum: translations[7],
+                seedGerminationTetum: translations[8],
+                pestsTetum: translations[9]
+            });
+            
 
 
+        }
+        catch {
+            console.error('Translation error:', error)
+        }
+        finally {
+            setLoading(false)
+        }
+
+    }
+
+
+    
+    //Handles text being written into text boxes
     const handleChange = (field: keyof typeof formData) => (event: React.ChangeEvent<HTMLInputElement>) => {
         setFormData((prevFormData) => ({
             ...prevFormData,
@@ -42,13 +136,38 @@ export default function Page1() {
         }))
     }
 
-    const handleSubmit = async () => {
+    //Handles change in tetum language text boxes
+    const handleChangeTetum = (field: keyof typeof formDataTetum) => (event: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData((prevFormData) => ({
+            ...prevFormData,
+            [field]: event.target.value
+        }))
+    }
 
+    //Hendles the translate button being pressed. 
+    const handleTetumTranslate = async () => {
+        setTetumTranslate(true)
+        await translateToTetum()
+    }
+
+    //Handles the clear button being pressed. 
+    const handleClear = async () => {
+        setTetumTranslate(false)
+    }
+
+    //What happens when the add button is pressed
+    const handleSubmit = async () => {
+        
         const requiredFields = [
             { value: formData.scientificName, name: 'Scientific Name' },
             { value: formData.commonName, name: 'Common Name' },
             { value: formData.leafType, name: 'Leaf Type' },
-            { value: formData.fruitType, name: 'Fruit Type' }
+            { value: formData.fruitType, name: 'Fruit Type' },
+
+            { value: formDataTetum.scientificNameTetum, name: 'Scientific Name' },
+            { value: formDataTetum.commonNameTetum, name: 'Common Name' },
+            { value: formDataTetum.leafTypeTetum, name: 'Leaf Type' },
+            { value: formDataTetum.fruitTypeTetum, name: 'Fruit Type' }
         ]
 
         const emptyField = requiredFields.find(field => !field.value)
@@ -62,8 +181,10 @@ export default function Page1() {
         setStatus('')
         setError('')
 
+        //Upload to english database
+        let rollbackID: string | null = null
         try {
-            const { error } = await supabase
+            const { data: data1, error: error1 } = await supabase
                 .from('species_en')
                 .insert([
                     { 
@@ -78,26 +199,51 @@ export default function Page1() {
                         seed_germination: formData.seedGermination,
                         pest: formData.pests 
                     }
-                ]).select()
+                ]).select().single()
 
-            if (error) {
-                console.error('========== SUPABASE ERROR DETAILS ==========')
-                console.error('Error object:', error)
-                console.error('Error code:', error.code)
-                console.error('Error details:', error.details)
-                console.error('Error hint:', error.hint)
+            if (error1) {
+                console.error('========== English Database Upload Error ==========')
                 console.error('Full error JSON:', JSON.stringify(error, null, 2))
-                console.error('===========================================')
-                
-                let errorMsg = `Error Code: ${error.code}\n`
-                errorMsg += `Message: ${error.message}\n`
-                if (error.details) errorMsg += `Details: ${error.details}\n`
-                if (error.hint) errorMsg += `Hint: ${error.hint}`
-                
-                throw new Error(errorMsg)
+
+                throw new Error(`DB1 failed: ${error1.message}`);
             }
 
-            setStatus('Species added successfully!')
+            rollbackID = data1.id
+            console.log("Upload to English database successful")
+
+            const { error: error2 } = await supabaseTetum
+                .from('species_en')
+                .insert([
+                    { 
+                        scientific_name: formDataTetum.scientificNameTetum,
+                        common_name: formDataTetum.commonNameTetum ,
+                        etymology: formDataTetum.etymologyTetum,
+                        habitat: formDataTetum.habitatTetum,
+                        identification_character: formDataTetum.identificationCharacteristicsTetum,
+                        leaf_type: formDataTetum.leafTypeTetum,
+                        fruit_type: formDataTetum.fruitTypeTetum,
+                        phenology: formDataTetum.phenologyTetum,
+                        seed_germination: formDataTetum.seedGerminationTetum,
+                        pest: formDataTetum.pestsTetum 
+                    }
+                ]).select().single()
+
+            if (error2) {
+                console.error('========== English Database Upload Error ==========')
+                console.error('Full error JSON:', JSON.stringify(error, null, 2))
+
+                throw new Error(`DB1 failed: ${error2.message}`);
+            }
+
+            rollbackID = data1.id
+            console.log("Upload to Tetum database successful")
+
+
+
+
+
+
+            setStatus('Uploads to both databases successful!')
             setError('')
 
             setFormData({
@@ -113,12 +259,49 @@ export default function Page1() {
                 pests: ''
             })
 
+            setFormDataTetum({
+                scientificNameTetum: '',
+                commonNameTetum: '',
+                leafTypeTetum: '',
+                fruitTypeTetum: '',
+                etymologyTetum: '',
+                habitatTetum: '',
+                identificationCharacteristicsTetum: '',
+                phenologyTetum: '',
+                seedGerminationTetum: '',
+                pestsTetum: ''
+            })
+
 
         }
 
 
         catch (error) {
             setStatus(`Error: ${(error as Error).message}`)
+            //If english database uploaded and Tetum did not rollback english upload
+            if (rollbackID) {
+                console.log("Trying rollback")
+                try {
+                    const { error: deleteError } = await supabase
+                    .from('species_en')
+                    .delete()
+                    .eq('id', rollbackID)
+
+                    if (deleteError) {
+                        console.error("ERROR! ROLLBACK FAILED!!!!")
+                        setStatus("CRITICAL ERROR, ROLLBACK ON ENGLISH DATABASE FAILED!")
+
+                    }
+                    else {
+                        console.log("Rollback successful")
+                        setStatus("Upload error, upload to english database has been rolled back!")
+                    }
+                }
+                catch (error) {
+                    console.error("ERROR! ROLLBACK FAILED!!!!")
+                    setStatus("CRITICAL ERROR, ROLLBACK ON ENGLISH DATABASE FAILED!")
+                }
+            }
         }
 
         finally {
@@ -130,7 +313,7 @@ export default function Page1() {
 
 
 
-
+    //UI
     return (
         <Box sx={{ width: '100%', paddingX: 0 }}>
 
@@ -143,6 +326,7 @@ export default function Page1() {
                     helperText="Required"
                     value={formData.scientificName}
                     onChange={handleChange('scientificName')}
+                    slotProps={{ htmlInput: { maxLength: maxSmallTextChar } }}
                     sx={{
                         '& .MuiInputBase-input': { color: 'white' },
                         '& .MuiInputLabel-root': { color: 'white' },
@@ -157,6 +341,7 @@ export default function Page1() {
                     helperText="Required"
                     value={formData.commonName}
                     onChange={handleChange('commonName')}
+                    slotProps={{ htmlInput: { maxLength: maxSmallTextChar } }}
                     sx={{
                         '& .MuiInputBase-input': { color: 'white' },
                         '& .MuiInputLabel-root': { color: 'white' },
@@ -174,6 +359,7 @@ export default function Page1() {
                     helperText="Required"
                     value={formData.leafType}
                     onChange={handleChange('leafType')}
+                    slotProps={{ htmlInput: { maxLength: maxSmallTextChar } }}
                     sx={{
                         '& .MuiInputBase-input': { color: 'white' },
                         '& .MuiInputLabel-root': { color: 'white' },
@@ -188,6 +374,7 @@ export default function Page1() {
                     helperText="Required"
                     value={formData.fruitType}
                     onChange={handleChange('fruitType')}
+                    slotProps={{ htmlInput: { maxLength: maxSmallTextChar } }}
                     sx={{
                         '& .MuiInputBase-input': { color: 'white' },
                         '& .MuiInputLabel-root': { color: 'white' },
@@ -209,6 +396,7 @@ export default function Page1() {
                     rows={4}
                     value={formData.etymology}
                     onChange={handleChange('etymology')}
+                    slotProps={{ htmlInput: { maxLength: maxEnglishChar } }}
                     sx={{
                     '& .MuiInputBase-input': { color: 'white' },
                     '& .MuiInputLabel-root': { color: 'white' },
@@ -223,6 +411,7 @@ export default function Page1() {
                     rows={4}
                     value={formData.habitat}
                     onChange={handleChange('habitat')}
+                    slotProps={{ htmlInput: { maxLength: maxEnglishChar } }}
                     sx={{
                     '& .MuiInputBase-input': { color: 'white' },
                     '& .MuiInputLabel-root': { color: 'white' },
@@ -239,6 +428,7 @@ export default function Page1() {
                     rows={4}
                     value={formData.identificationCharacteristics}
                     onChange={handleChange('identificationCharacteristics')}
+                    slotProps={{ htmlInput: { maxLength: maxEnglishChar } }}
                     sx={{
                         '& .MuiInputBase-input': { color: 'white' },
                         '& .MuiInputLabel-root': { color: 'white' },
@@ -252,6 +442,7 @@ export default function Page1() {
                     rows={4}
                     value={formData.phenology}
                     onChange={handleChange('phenology')}
+                    slotProps={{ htmlInput: { maxLength: maxEnglishChar } }}
                     sx={{
                         '& .MuiInputBase-input': { color: 'white' },
                         '& .MuiInputLabel-root': { color: 'white' },
@@ -268,6 +459,7 @@ export default function Page1() {
                     rows={4}
                     value={formData.seedGermination}
                     onChange={handleChange('seedGermination')}
+                    slotProps={{ htmlInput: { maxLength: maxEnglishChar } }}
                     sx={{
                         '& .MuiInputBase-input': { color: 'white' },
                         '& .MuiInputLabel-root': { color: 'white' },
@@ -281,6 +473,7 @@ export default function Page1() {
                     rows={4}
                     value={formData.pests}
                     onChange={handleChange('pests')}
+                    slotProps={{ htmlInput: { maxLength: maxEnglishChar } }}
                     sx={{
                         '& .MuiInputBase-input': { color: 'white' },
                         '& .MuiInputLabel-root': { color: 'white' },
@@ -310,13 +503,205 @@ export default function Page1() {
 
             <Box>
                 <Button variant="contained"
-                onClick={handleSubmit}
+                onClick={handleTetumTranslate}
                 disabled={loading}
                 >
-                    {loading ? 'Adding...' : 'Add Entry'}
+                    {loading ? 'Adding...' : 'Translate to tetum'}
                 </Button>
             </Box>
 
+            <Box sx={{ marginTop: 2 }}>
+                <Button variant="contained"
+                onClick={handleClear}
+                disabled={loading}
+                >
+                    {loading ? 'Clearing...' : 'Clear Entry'}
+                </Button>
+            </Box>
+
+            {tetumTranslate && (
+                <Box sx={{marginTop: 2}}>
+                    <div><h3>Tetum Translation:</h3></div>
+                    <div><h5>Please review, edit if needed and then confirm using the button at the bottom</h5></div>
+                    <Box sx={{marginTop: 2}}>   
+                        <TextField
+                            id="TetumTextBox1"
+                            label="Scientific Name"
+                            helperText="Required"
+                            value={formDataTetum.scientificNameTetum}
+                            onChange={handleChangeTetum('scientificNameTetum')}
+                            slotProps={{ htmlInput: { maxLength: maxTetumChar } }}
+                            sx={{
+                                '& .MuiInputBase-input': { color: 'white' },
+                                '& .MuiInputLabel-root': { color: 'white' },
+                                '& .MuiFormHelperText-root': { color: 'red' },
+                                marginRight: 8
+                            }}
+                            />
+
+                            <TextField
+                            id="TetumTextBox2"
+                            label="Common Name"
+                            helperText="Required"
+                            value={formDataTetum.commonNameTetum}
+                            onChange={handleChangeTetum('commonNameTetum')}
+                            slotProps={{ htmlInput: { maxLength: maxTetumChar } }}
+                            sx={{
+                                '& .MuiInputBase-input': { color: 'white' },
+                                '& .MuiInputLabel-root': { color: 'white' },
+                                '& .MuiFormHelperText-root': { color: 'red' }
+                            }}
+                            />
+
+                    
+                    </Box>
+
+                    <Box sx={{marginTop: 2}}>   
+                        <TextField
+                            id="TetumTextBox3"
+                            label="Leaf Type"
+                            helperText="Required"
+                            value={formDataTetum.leafTypeTetum}
+                            onChange={handleChangeTetum('leafTypeTetum')}
+                            slotProps={{ htmlInput: { maxLength: maxTetumChar } }}
+                            sx={{
+                                '& .MuiInputBase-input': { color: 'white' },
+                                '& .MuiInputLabel-root': { color: 'white' },
+                                '& .MuiFormHelperText-root': { color: 'red' },
+                                marginRight: 8
+                            }}
+                            />
+
+                            <TextField
+                            id="TetumTextBox4"
+                            label="Fruit Type"
+                            helperText="Required"
+                            value={formDataTetum.fruitTypeTetum}
+                            onChange={handleChangeTetum('fruitTypeTetum')}
+                            slotProps={{ htmlInput: { maxLength: maxTetumChar } }}
+                            sx={{
+                                '& .MuiInputBase-input': { color: 'white' },
+                                '& .MuiInputLabel-root': { color: 'white' },
+                                '& .MuiFormHelperText-root': { color: 'red' }
+                            }}
+                            />
+
+                    
+                    </Box>      
+
+                    <div><h5>Optional:</h5></div>
+
+                    <Box sx={{ display: 'flex', gap: 1, marginTop: 3, marginBottom: 3, maxWidth: '70%', marginX: 'auto'}}>
+                        <TextField 
+                            fullWidth 
+                            label="Etymology" 
+                            id="TetumBigText1"
+                            multiline
+                            rows={4}
+                            value={formDataTetum.etymologyTetum}
+                            onChange={handleChangeTetum('etymologyTetum')}
+                            slotProps={{ htmlInput: { maxLength: maxTetumChar } }}
+                            sx={{
+                            '& .MuiInputBase-input': { color: 'white' },
+                            '& .MuiInputLabel-root': { color: 'white' },
+                            }}
+                        />
+
+                        <TextField 
+                            fullWidth 
+                            label="Habitat" 
+                            id="TetumBigText2"
+                            multiline
+                            rows={4}
+                            value={formDataTetum.habitatTetum}
+                            onChange={handleChangeTetum('habitatTetum')}
+                            slotProps={{ htmlInput: { maxLength: maxTetumChar } }}
+                            sx={{
+                            '& .MuiInputBase-input': { color: 'white' },
+                            '& .MuiInputLabel-root': { color: 'white' },
+                            }}
+                        />
+                    </Box>
+
+
+                    <Box sx={{ display: 'flex', gap: 1, marginTop: 3, marginBottom: 3, maxWidth: '70%', marginX: 'auto'}}>
+                        <TextField fullWidth 
+                            label="Identification Characteristics" 
+                            id="TetumBigText3"
+                            multiline
+                            rows={4}
+                            value={formDataTetum.identificationCharacteristicsTetum}
+                            onChange={handleChangeTetum('identificationCharacteristicsTetum')}
+                            slotProps={{ htmlInput: { maxLength: maxTetumChar } }}
+                            sx={{
+                                '& .MuiInputBase-input': { color: 'white' },
+                                '& .MuiInputLabel-root': { color: 'white' },
+                            }}
+                        />
+
+                        <TextField fullWidth 
+                            label="Phenology" 
+                            id="TetumBigText4"
+                            multiline
+                            rows={4}
+                            value={formDataTetum.phenologyTetum}
+                            onChange={handleChangeTetum('phenologyTetum')}
+                            slotProps={{ htmlInput: { maxLength: maxTetumChar } }}
+                            sx={{
+                                '& .MuiInputBase-input': { color: 'white' },
+                                '& .MuiInputLabel-root': { color: 'white' },
+                            }}
+                        />
+                    </Box>
+
+
+                    <Box sx={{ display: 'flex', gap: 1, marginTop: 3, marginBottom: 3, maxWidth: '70%', marginX: 'auto'}}>
+                        <TextField fullWidth 
+                            label="Seed Germination" 
+                            id="TetumBigText5"
+                            multiline
+                            rows={4}
+                            value={formDataTetum.seedGerminationTetum}
+                            onChange={handleChangeTetum('seedGerminationTetum')}
+                            slotProps={{ htmlInput: { maxLength: maxTetumChar } }}
+                            sx={{
+                                '& .MuiInputBase-input': { color: 'white' },
+                                '& .MuiInputLabel-root': { color: 'white' },
+                            }}
+                        />
+
+                        <TextField fullWidth 
+                            label="Pests" 
+                            id="TetumBigText6"
+                            multiline
+                            rows={4}
+                            value={formDataTetum.pestsTetum}
+                            onChange={handleChangeTetum('pestsTetum')}
+                            slotProps={{ htmlInput: { maxLength: 2500 } }}
+                            sx={{
+                                '& .MuiInputBase-input': { color: 'white' },
+                                '& .MuiInputLabel-root': { color: 'white' },
+                            }}
+                        />
+                    </Box>
+
+                    <Box sx={{ marginTop: 2 }}>
+                        <Button variant="contained"
+                        onClick={handleSubmit}
+                        disabled={loading}
+                        >
+                            {loading ? 'Adding...' : 'Add Entry'}
+                        </Button>
+                    </Box>
+                </Box>
+            )}    
+
         </Box>
+
+              
+               
+
     )
+
+     
 }

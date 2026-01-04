@@ -4,6 +4,8 @@ import Paper from '@mui/material/Paper'
 import { useEffect, useState } from "react"
 import { createClient } from "@supabase/supabase-js"
 
+
+
 console.log("URL = ", import.meta.env.VITE_SUPABASE_URL)
 
 const supabase = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY)
