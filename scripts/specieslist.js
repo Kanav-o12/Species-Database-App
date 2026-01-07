@@ -105,6 +105,8 @@ if (document.getElementById("species-list")) {
         })
         .catch(err => {
             console.error("Error loading Excel:", err);
+        renderSpecies(dummyData);
+
         });
 }
 
@@ -116,24 +118,19 @@ const searchInput = document.getElementById("searchInput");
 if (searchInput) {
     searchInput.addEventListener("input", (e) => {
         const query = e.target.value.toLowerCase().trim();
-
-        if (!loadedSpeciesData.length) return;
+        
+        if (!loadedSpeciesData || loadedSpeciesData.length === 0) return;
 
         if (query === "") {
             renderSpecies(loadedSpeciesData);
             return;
-        }
+        }z
 
         const filteredData = loadedSpeciesData.filter(species =>
             species.scientific_name &&
             species.scientific_name.toLowerCase().includes(query)
         );
 
-        // ✅ NEW CONDITION
-        if (filteredData.length === 0) {
-            renderNoResults();
-        } else {
-            renderSpecies(filteredData);
-        }
+        renderSpecies(filteredData);
     });
 }
