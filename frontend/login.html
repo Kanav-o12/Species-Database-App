@@ -346,9 +346,19 @@
 
             console.log("login success", data)
 
-            //simulate device user provisionign
+            //save basic user infp locally so app works offline
             localStorage.setItem("user_id", data.user_id)
             localStorage.setItem("role", data.role)
+
+            //tracking when last successful online login happened
+            //use later to decide if to re-auth
+            localStorage.setItem("last_auth_time", Date.now().toString())
+
+            //store local hash of password for offline re-auth
+            const encoder = new TextEncoder()
+            const pwData = encoder.encode(password)
+
+            const hashBuffer = await crypto.subtle.digest*
 
             alert("login successful!")
         }
