@@ -1,6 +1,7 @@
     const languages = [
       { code: "en-AU", name: "ENGLISH AU", flag: "🇦🇺" },
       { code: "tet",   name: "Tetum",      flag: "🇹🇱" },
+      //testchange
     ];
 
     let selected = languages[0];
