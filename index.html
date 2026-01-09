@@ -88,6 +88,28 @@
         text-align: center;
     }
 
+    .tutorial-pill {
+        width: 100%;
+        max-width: 160px;
+        margin-bottom: 1.2rem;
+        padding: 0.65rem 1.2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-align: center;
+        border-radius: 14px;
+        border: 2px solid #8AC642;
+        background: #ffffff;
+        color: #1e293b;
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+
+    .tutorial-pill:hover {
+        background: #4E8A16;
+        color: #f9fbfc;
+    }
+
+
     /* The pill container */
     .lang-toggle{
         display: inline-flex;
@@ -96,6 +118,7 @@
         border-radius: 14px;
         background: #ffffff;
         margin-bottom: 1.3rem;
+        
     }
 
     .lang-option{
@@ -165,8 +188,14 @@
         <p class = "lang-help">
             Select your preferred language (Tetum support coming soon)
         </p>
+
+        <div class = "tutorial-pill" onclick = "window.location.href='tutorial.html'">
+            Tutorials
+        </div>
+
     </main>
     <!-- The Script controls our buttons and service workers -->
+    <script src="scripts/preloadImages.js"></script>
     <script>
         const buttons = document.querySelectorAll('.lang-option');
         buttons.forEach(button => {
@@ -190,12 +219,23 @@
         });
 
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker
-                .register('service-worker.js')
-                .catch((err) => console.log('Service Worker registration failed: ', err));
-            });
+            window.addEventListener('load', async () => {
+                    try {
+                    const reg = await navigator.serviceWorker.register('/service-worker.js');
 
+                    if (!navigator.serviceWorker.controller) {
+                        console.log("Service Worker installed, reloading...");
+                        location.reload();
+                        return;
+                    }
+
+                    console.log("Service Worker active, preloading images...");
+                    preloadAllImages();
+
+                } catch (err) {
+                    console.error('Service Worker registration failed:', err);
+                }
+            });
         }
     </script>
 </body>
