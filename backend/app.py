@@ -150,8 +150,6 @@ def upload():
             'pest': pest
         }).execute()
         
-        print(f"Response data: {data1.data}")
-        print(f"Response type: {type(data1.data)}")
         
         if not data1.data:
             raise Exception('DB1 failed: No data returned')
@@ -177,9 +175,20 @@ def upload():
         if not data2.data:
             raise Exception('DB2 failed: No data returned')
         
+        rollback_id_tetum = data2.data[0]['species_id']
         print("Upload to Tetum database successful")
         
-        
+        try:
+            log_change("species", rollback_id, "upload")
+        except Exception as log_change_error:
+            print(f"Change log error, rolling back uploads: {str(log_change_error)}")
+            try:
+                supabase.table('species_en').delete().eq('species_id', rollback_id).execute()
+                supabase.table('species_tet').delete().eq('species_id', rollback_id_tetum).execute()
+            except Exception as rollback_error:
+                print(f"Rollback failed: {str(rollback_error)}")
+                return jsonify({"error": f"ROLLBACK ERROR AFTER CHANGE LOG ERROR, DATABASES MAY NOT BE IN SYNC WITH EACH OTHER AND CHANGE LOG!!!! {str(rollback_error)}"}), 500
+            return jsonify({"error": f"Error occured when updating change log: {str(log_change_error)}"}), 500
         
         return jsonify("Created"), 200
 
@@ -195,7 +204,7 @@ def upload():
                 return jsonify({"error": f"English database rolled back: {str(e)}"}), 500
             except Exception as rollback_error:
                 print(f"Rollback failed: {str(rollback_error)}")
-                return jsonify({"error": f"ROLLBACK ERROR, DATABASES MAY NOT BE IN SYNC {str(e)}"}), 500
+                return jsonify({"error": f"ROLLBACK ERROR, DATABASES MAY NOT BE IN SYNC {str(rollback_error)}"}), 500
         
 
 
