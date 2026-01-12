@@ -6,6 +6,7 @@ import { EditEntry } from "./Pages/EditEntry";
 import { AddExcel } from "./Pages/AddExcel";
 import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import UsersPage from "./Pages/Users";
+import Audit from "./Pages/Audit";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/AddExcel" element={<AddExcel />} />
         <Route path="/EditEntry" element={<EditEntry />} />
         <Route path="/Users" element={<UsersPage />} />
+        <Route path="/Audit" element={<Audit />} />
       </Routes>
     </Router>
   );
