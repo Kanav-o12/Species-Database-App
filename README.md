@@ -1,67 +1,100 @@
-# Rai Matak Species Guide (English-Tetum)
+# Rai Matak Species Database App (English–Tetum)
 
-An essential, offline field guide for the Rai Matak reforestation program in Timor-Leste.
+**Product Owner:** Amy Stephenson, CEO  
+**Technical Advisor:** Maniruddin Dhabak (Community Forestry)
 
 ---
 
-## Project Overview
+## Overview
 
-The **Rai Matak Species Guide** is a dedicated mobile application developed to support the field staff, botanists, and community partners involved in the Rai Matak reforestation efforts.
+The **Rai Matak Species Database App** is an offline-capable mobile field guide developed to support the Rai Matak reforestation program in Timor-Leste.
 
-Designed specifically for the challenging remote environments of Timor-Leste, the app's core value is its complete **offline functionality**. It ensures that critical species identification, ecological data, and learning resources are accessible exactly when and where they are needed, regardless of internet connectivity.
+It is designed for field staff, nursery workers, and community partners operating across thousands of smallholder farms, often in areas with unreliable or no internet access.
+
+The app consolidates scattered PDFs, photos, and guides into a single **searchable, bilingual (English–Tetum) platform**, improving species identification accuracy, streamlining nursery management, and saving valuable time in the field.
 
 ---
 
 ## Rai Matak
 
-*Rai Matak* translates to **"Green Land"** or **"Lush Earth"** in Tetum, reflecting the program's vital mission to restore Timor-Leste’s natural biodiversity and forest cover.
+*Rai Matak* translates to **“Green Land”** or **“Lush Earth”** in Tetum, reflecting the program’s mission to restore forest cover and biodiversity across Timor-Leste.
+
+---
+
+## Purpose
+
+Field teams frequently work in remote locations with limited connectivity, leading to:
+
+- Inconsistent species identification  
+- Difficulty accessing reference materials  
+- Information loss in the field  
+
+This app provides a **simple, offline-first tool** that allows users to identify approved species by:
+
+- Scientific name  
+- Common name  
+- Tetum name (*Naran Tetum*)  
+- Leaf characteristics  
+- Fruit type  
+
+All key species information remains available **offline once installed**.
 
 ---
 
 ## Key Features
 
-This application is built to be robust, intuitive, and highly functional in the field:
+- **Bilingual Support (English & Tetum)**  
+  All navigation and species content is available in both languages.
 
-- **Bilingual Support (English & Tetum):**  
-  All content, navigation, and species descriptions are available in both English and Tetum, ensuring accessibility for all staff.
+- **100% Offline Access**  
+  Species data, images, and guides are stored locally on the device.
 
-- **100% Offline Access:**  
-  Once the app is downloaded, all species data, photos, and identification keys are stored locally. No internet connection is required for day-to-day operation.
+- **Species Identification**  
+  Detailed profiles for native and priority species used in Rai Matak reforestation.
 
-- **Species Identification:**  
-  Detailed profiles for native and important endemic tree species relevant to the Rai Matak program.
+- **Rich Species Profiles**  
+  Each profile includes:
+  - Scientific and common names  
+  - Tetum names  
+  - Identification characteristics  
+  - Habitat and ecological notes  
+  - Local uses  
+  - Seed germination and propagation SOPs  
+  - Pests and diseases  
+  - Photo galleries (leaf, bark, fruit, seedling stages)  
+  - Tutorial videos where available  
 
-- **Rich Data Fields:**  
-  Each species profile includes:
-  - Common and scientific names  
-  - Tetum names (*Naran Tetum*)  
-  - Detailed photographs (leaves, bark, fruit, flowers)  
-  - Ecological notes (habitat, elevation, soil type)  
-  - Propagation and management advice  
+- **Search & Filtering**  
+  Quickly locate species by name, characteristic, or habitat.
 
-- **Intuitive Search and Filtering:**  
-  Quickly locate species by name, characteristic, or habitat type.
+---
 
-  ## Command Line Interface (CLI)
+## Dataset & Data Integrity
 
-The project includes a Python CLI for exploring the species database.
+The system is backed by a curated **Excel-based dataset**, normalized and validated before being imported into the app.
+
+### Validation Layers
+
+1. **JSON Schema Validation**  
+   Ensures structural consistency across records.
+
+2. **Pydantic Validation**  
+   Validates field types, required values, and custom rules using the `SpeciesRecord` model.
+
+3. **Duplicate Detection**  
+   Prevents duplicate scientific names to maintain dataset integrity.
+
+---
+
+## Command Line Interface (CLI)
+
+The project includes a Python CLI to explore, validate, and audit the species dataset.
 
 ### Setup
 
 ```bash
 python -m venv venv
-venv\Scripts\activate        # on Windows
+venv\Scripts\activate        # Windows
+# source venv/bin/activate  # macOS/Linux
+
 pip install -r requirements.txt
-
-# General help
-python -m species_cli.cli --help
-
-# List species
-python -m species_cli.cli list-all --limit 20
-
-# Search
-python -m species_cli.cli search --habitat "coastal"
-python -m species_cli.cli search --common-name "oak"
-
-# Show details for one species
-python -m species_cli.cli show "Acacia mangium"
