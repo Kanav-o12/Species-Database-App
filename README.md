@@ -1,64 +1,100 @@
-# Species Database App
+# Rai Matak Species Database App (English–Tetum)
 
 **Product Owner:** Amy Stephenson, CEO  
-**Technical Advisor:** Maniruddin Dhabak (Community Forestry)  
+**Technical Advisor:** Maniruddin Dhabak (Community Forestry)
 
 ---
 
 ## Overview
 
-The **Species Database App** is developed for the Rai Matak Project to support field staff working across thousands of smallholder farms in Timor-Leste. The goal is to provide an **offline-capable, bilingual mobile application** that allows users to quickly identify and learn about approved tree species used in national reforestation programs.
+The **Rai Matak Species Database App** is an offline-capable mobile field guide developed to support the Rai Matak reforestation program in Timor-Leste.
 
-By consolidating scattered PDFs, photos, and guides into one accessible platform, the app enhances species identification accuracy, streamlines nursery management, and saves valuable time in the field.
+It is designed for field staff, nursery workers, and community partners operating across thousands of smallholder farms, often in areas with unreliable or no internet access.
+
+The app consolidates scattered PDFs, photos, and guides into a single **searchable, bilingual (English–Tetum) platform**, improving species identification accuracy, streamlining nursery management, and saving valuable time in the field.
+
+---
+
+## Rai Matak
+
+*Rai Matak* translates to **“Green Land”** or **“Lush Earth”** in Tetum, reflecting the program’s mission to restore forest cover and biodiversity across Timor-Leste.
 
 ---
 
 ## Purpose
 
-Field teams often operate in remote locations with unreliable connectivity, leading to inconsistent species identification and information loss. This app provides a **simple, searchable tool**, available in **English and Tetum**, that helps users identify species by:
+Field teams frequently work in remote locations with limited connectivity, leading to:
+
+- Inconsistent species identification  
+- Difficulty accessing reference materials  
+- Information loss in the field  
+
+This app provides a **simple, offline-first tool** that allows users to identify approved species by:
 
 - Scientific name  
 - Common name  
-- Leaf shape/type  
+- Tetum name (*Naran Tetum*)  
+- Leaf characteristics  
 - Fruit type  
 
-Users can also access key ecological and management information **offline**.
+All key species information remains available **offline once installed**.
 
 ---
 
-## Project Scope
+## Key Features
 
-The app includes comprehensive species profiles with:
+- **Bilingual Support (English & Tetum)**  
+  All navigation and species content is available in both languages.
 
-- Scientific/Common names and etymology  
-- Identification characteristics and habitat data  
-- Local uses, seed germination SOPs (with tutorial videos)  
-- Pests and diseases  
-- Photo galleries (leaf, flower, fruit, seedling stages)  
+- **100% Offline Access**  
+  Species data, images, and guides are stored locally on the device.
 
-The system is backed by a curated **Excel-based dataset**, normalized for import into the app.
+- **Species Identification**  
+  Detailed profiles for native and priority species used in Rai Matak reforestation.
+
+- **Rich Species Profiles**  
+  Each profile includes:
+  - Scientific and common names  
+  - Tetum names  
+  - Identification characteristics  
+  - Habitat and ecological notes  
+  - Local uses  
+  - Seed germination and propagation SOPs  
+  - Pests and diseases  
+  - Photo galleries (leaf, bark, fruit, seedling stages)  
+  - Tutorial videos where available  
+
+- **Search & Filtering**  
+  Quickly locate species by name, characteristic, or habitat.
 
 ---
 
-## Validation & Data Integrity
+## Dataset & Data Integrity
 
-Data validation is performed in three layers:
+The system is backed by a curated **Excel-based dataset**, normalized and validated before being imported into the app.
 
-1. **JSON Schema Validation**: Ensures data structure matches expected schema.  
-2. **Pydantic Validation**: Validates types, required fields, and custom rules via the `SpeciesRecord` model.  
-3. **Duplicate Checking**: Detects duplicate scientific names to maintain dataset integrity.  
+### Validation Layers
 
-# Setup
+1. **JSON Schema Validation**  
+   Ensures structural consistency across records.
+
+2. **Pydantic Validation**  
+   Validates field types, required values, and custom rules using the `SpeciesRecord` model.
+
+3. **Duplicate Detection**  
+   Prevents duplicate scientific names to maintain dataset integrity.
+
+---
+
+## Command Line Interface (CLI)
+
+The project includes a Python CLI to explore, validate, and audit the species dataset.
+
+### Setup
 
 ```bash
 python -m venv venv
-venv\Scripts\activate        # on Windows
-# For macOS/Linux use:
-# source venv/bin/activate
+venv\Scripts\activate        # Windows
+# source venv/bin/activate  # macOS/Linux
 
 pip install -r requirements.txt
-
-#Run
-python python cli.py data\new_species_data.xlsx species_schema.json --audit
-
-
