@@ -1,7 +1,7 @@
 .banner {
-  position: absolute;
-  top: 15%;
-  right: 0%;
+  position: sticky;
+  top: 50px;
+  right: 0px;
   background-color: #27c861;
   color: white;
   padding: 0.8rem 1.2rem;
