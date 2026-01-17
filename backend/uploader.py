@@ -31,10 +31,18 @@ async def translate_to_tetum(text):
         return ""
     try:
         result = await translator.translate(text, dest="tet")
-        return result.text
+        translated = result.text
+
+        if translated.strip().lower() == text.strip().lower():
+            retry_result = await translator.translate(text, dest="tet")
+            return retry_result.text
+
+        return translated
+
     except Exception as e:
         print("Translation failed:", e)
         return ""
+
 
 def normalize(col):
     return col.strip().lower().replace(" ", "_")
