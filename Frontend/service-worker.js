@@ -1,73 +1,100 @@
-//Species Database Application Service Worker (Needs more work done)
+/* service-worker.js */
+const CACHE_NAME = "species-app-v1";
 
-const CACHE_NAME = "sba-cache";
+const CORE_ASSETS = [
+  "./",
+  "./index.html",
+  "./home.html",
+  "./specie.html",
+  "./tetum.html",
+  "./tutorial.html",
+  "./video.html",
+  "./login.html",
+  "./language.html",
+  "./imagepreview.html",
 
-//Files that need to be cahced
-const FILES_TO_CACHE = [
-    "/index.html",
-    "/home.html",
-    "/specie.html",
-    "imagepreview.html",
-    "/scripts/specieslist.js",
-    "/scripts/imageCache.js",
-    "/scripts/preloadImages.js",
-    "/scripts/filterCarousel.js",
-    "/data/images.json"
+  "./manifest.json",
+
+  "./css/login.css",
+  "./css/language.css",
+  "./css/responsive.css",
+
+  "./scripts/specieslist.js",
+  "./scripts/filterCarousel.js",
+  "./scripts/sw-register.js",
+  "./scripts/sw-register.js",
+  "./scripts/imageCache.js",
+  "./scripts/preloadImages.js",
+  "./scripts/config.js",
+  "./scripts/db.js",
+  "./scripts/bundleSync.js",
+  "./scripts/sw-register.js",
+
+  // /icons
+  "./icons/icon-192x192.png",
+  "./icons/icon-512x512.png",
 ];
 
-self.addEventListener('install', (event) => {
-    console.log('Service Worker installed');
-    event.waitUntil(
-        caches.open(CACHE_NAME).then(cache => {
-            console.log("Caching files");
-            return cache.addAll(FILES_TO_CACHE);
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(async (cache) => {
+      await Promise.all(
+        CORE_ASSETS.map(async (url) => {
+          try {
+            const res = await fetch(url, { cache: "no-cache" });
+            if (res.ok) await cache.put(url, res);
+          } catch (_) {}
         })
-    );
-    self.skipWaiting();
+      );
+    })
+  );
+  self.skipWaiting();
 });
 
-self.addEventListener('activate', (event) => {
-    console.log('Service Worker activated');
-    event.waitUntil(
-        caches.keys().then(keys =>
-            Promise.all(
-                keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
-            )
-        )
-    );
-    self.clients.claim();
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(
+        keys.map((k) => (k !== CACHE_NAME ? caches.delete(k) : Promise.resolve()))
+      )
+    )
+  );
+  self.clients.claim();
 });
 
-self.addEventListener('fetch', (event) => {
-    event.respondWith(
-            caches.match(event.request).then(cached =>{
-                if (cached) return cached;
+self.addEventListener("fetch", (event) => {
+  const req = event.request;
+  const url = new URL(req.url);
 
-                return fetch(event.request).then(response => {
-                    if (event.request.destination === "image") {
-                    return caches.open(CACHE_NAME).then(cache => {
-                        cache.put(event.request, response.clone());
-                         return response;
-                    });
-                }
-                return response;
-            }).catch(() => {
-                //fallback when offline
-                if (event.request.destination === "image") {
-                    return caches.match(event.request) || new Response('', {status:404});
-                }
-                if (event.request.mode === "navigate") {
-                    return caches.match(event.request)
-                }
-            });
-        })
-    );
-});
+  
+  if (url.origin !== location.origin) return;
 
-self.addEventListener("message", async event => {
-    if (event.data?.type === "CACHE_IMAGES"){
-        const cache = await caches.open(CACHE_NAME);
-        await cache.addAll(event.data.images);
-        console.log(`Cached ${event.data.images.length} images`);
-    }
+  event.respondWith(
+    (async () => {
+      const cache = await caches.open(CACHE_NAME);
+
+      const cached = await cache.match(req);
+      if (cached) return cached;
+
+    
+      try {
+        const fresh = await fetch(req);
+        if (fresh && fresh.ok && req.method === "GET") {
+          cache.put(req, fresh.clone()).catch(() => {});
+        }
+        return fresh;
+      } catch (e) {
+        // 3) Offline fallback:
+      
+        if (req.mode === "navigate") {
+          return (await cache.match("./home.html")) || (await cache.match("./index.html"));
+        }
+       
+        if (req.destination === "image") {
+          return new Response("", { status: 204 });
+        }
+        return new Response("Offline", { status: 503 });
+      }
+    })()
+  );
 });
