@@ -547,6 +547,48 @@ async def translateMultipleTexts(texts):
     
     return results
 
+@app.put("/api/species/<int:species_id>/english")
+def update_species_english(species_id):
+    admin_id, err = get_admin_user(supabase)
+    if err:
+        return jsonify({"error": err[0]}), err[1]
+    
+    data = request.get_json(silent=True)
+    if not data:
+        return jsonify({"error": "missing JSON body"}), 400
+    
+    english_update = {}
+
+    ENGLISH_FIELDS = [
+        "scientific_name",
+        "common_name",
+        "etymology",
+        "habitat",
+        "identification_character",
+        "leaf_type",
+        "fruit_type",
+        "phenology",
+        "seed_germination",
+        "pest"        
+    ]
+
+    for field in ENGLISH_FIELDS:
+        if field in data:
+            english_update[field] = data[field]
+
+    if not english_update:
+        return jsonify({"error": "no tetum fields provided"}), 400
+    
+    # update english row
+    supabase.table("species_en")\
+        .update(english_update)\
+        .eq("species_id", species_id)\
+        .execute()
+    
+    log_change("species", species_id, "UPDATE")
+
+    return jsonify({"status": "english updated"}), 200
+
 @app.put("/api/species/<int:species_id>/tetum")
 def update_species_tet(species_id):
     admin_id, err = get_admin_user(supabase)
